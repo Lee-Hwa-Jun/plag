@@ -48,13 +48,18 @@ TEMPLATES = [
 WSGI_APPLICATION = "plag.wsgi.application"
 
 
+from decouple import config  # .env 파일에서 로드하기 위함
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',  # MySQL 백엔드 사용
+        'NAME': config('MYSQL_DATABASE'),      # .env 파일에서 로드
+        'USER': config('MYSQL_USER'),          # .env 파일에서 로드
+        'PASSWORD': config('MYSQL_PASSWORD'),  # .env 파일에서 로드
+        'HOST': 'db',                          # Docker Compose의 MariaDB 서비스 이름
+        'PORT': '3306',                        # MariaDB 기본 포트
     }
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
