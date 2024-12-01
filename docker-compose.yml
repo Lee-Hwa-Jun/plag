@@ -16,10 +16,10 @@ services:
     ports:
       - "3306:3306"
 
+
   web:
     build: .
     container_name: plag_web
-    command: ["gunicorn", "--bind", "0.0.0.0:8000", "plag.wsgi:application"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 10s
@@ -27,10 +27,18 @@ services:
       retries: 3
     volumes:
       - .:/app
+      - static:/app/static  # web 컨테이너의 static 폴더를 공유
     depends_on:
       - db
     ports:
       - "8000:8000"
+    environment:
+      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+    command: >
+      sh -c "/app/wait-for-it.sh db:3306 && python manage.py makemigrations && python manage.py migrate && python manage.py shell < /app/create_superusers.py && python manage.py collectstatic --noinput && gunicorn plag.wsgi:application --bind 0.0.0.0:8000 --log-level info"
+
 
   nginx:
     image: nginx:latest
@@ -42,6 +50,7 @@ services:
       - "80:80"
     depends_on:
       - web
+
 
 volumes:
   db_data:

@@ -18,6 +18,8 @@ RUN pip install --no-cache-dir --use-pep517 -r requirements.txt
 
 # 애플리케이션 복사
 COPY . .
+COPY wait-for-it.sh /app/wait-for-it.sh
+RUN chmod +x /app/wait-for-it.sh
 
 # Django 명령 실행
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "plag.wsgi:application"]
