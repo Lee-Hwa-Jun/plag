@@ -1,32 +1,36 @@
-version: '3.9'
+version: '3'
 
 services:
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: plag_web
-    env_file:
-      - .env
-    command: gunicorn --bind 0.0.0.0:8000 plag.wsgi:application
-    volumes:
-      - static:/app/static
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
-
   db:
     image: mariadb:10.6
     container_name: plag_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: plagdb
-      MYSQL_USER: plaguser
-      MYSQL_PASSWORD: plagpassword
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: "trust"
     volumes:
       - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  web:
+    build: .
+    container_name: plag_web
+    command: ["gunicorn", "--bind", "0.0.0.0:8000", "plag.wsgi:application"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
 
   nginx:
     image: nginx:latest
@@ -40,5 +44,5 @@ services:
       - web
 
 volumes:
-  static:
   db_data:
+  static:

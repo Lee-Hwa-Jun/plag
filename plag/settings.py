@@ -6,7 +6,7 @@ SECRET_KEY = "django-insecure-&=g7y67zg%a6=ambox+dmv7s5w(9#1z4hj188+u%llk25!75(s
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -15,6 +15,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'rest_framework',
+    'draw',
 ]
 
 MIDDLEWARE = [
@@ -60,6 +62,13 @@ DATABASES = {
         'PORT': '3306',                        # MariaDB 기본 포트
     }
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL')
+EMAIL_HOST_PASSWORD = config('EMAIL_PASSWORD')  # 앱 비밀번호 사용
 
 AUTH_PASSWORD_VALIDATORS = [
     {
