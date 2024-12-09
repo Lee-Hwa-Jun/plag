@@ -1,6 +1,7 @@
 FROM python:3.10
 
 WORKDIR /app
+RUN mkdir -p /app/log && touch /app/log/scheduler.log && chmod 777 /app/log /app/log/scheduler.log
 
 # 필수 빌드 도구 설치
 RUN apt-get update && apt-get install -y \
